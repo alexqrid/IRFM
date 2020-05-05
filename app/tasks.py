@@ -164,11 +164,13 @@ def process_report(self, static, year):
     self.update_state(state='Обработка',
                       meta={'current': 20, 'total': 100,
                             'status': message})
-    if not os.path.exists("/home/alexqrid/nltk_data"):
-        nltk.download('punkt')
-        nltk.download('stopwords')
-        nltk.download('averaged_perceptron_tagger')
-        nltk.download('wordnet')
+    if not os.path.exists(f"{static}/nltk_data"):
+        nltk_path = f"{static}/nltk_data"
+        os.mkdir(nltk_path)
+        nltk.download('punkt',download_dir=nltk_path)
+        nltk.download('stopwords',download_dir=nltk_path)
+        nltk.download('averaged_perceptron_tagger',download_dir=nltk_path)
+        nltk.download('wordnet',download_dir=nltk_path)
 
     message = "Удаление стоп-слов текста."
     self.update_state(state='Обработка',
@@ -181,7 +183,6 @@ def process_report(self, static, year):
                       meta={'current': 60, 'total': 100,
                             'status': message})
     base_words = normalize(static=static, year=year, words=words)
-
     message = "Построение графиков"
     self.update_state(state='Обработка',
                       meta={'current': 80, 'total': 100,

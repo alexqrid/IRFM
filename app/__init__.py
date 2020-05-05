@@ -6,7 +6,7 @@ from app.utils import download, url, base_url
 
 app = Flask(__name__)
 app.config.from_object(Config)
-es = Elasticsearch("http://127.0.0.1:9200")
+es = Elasticsearch(app.config['ELASTICSEARCH_URL'],timeout=500)
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 

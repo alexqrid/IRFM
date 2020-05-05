@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск</title>
+</head>
+<body>
+<h1> Поиск по отчётам ЦБ РФ</h1>
+<input type='text' id='word'>
+     <button type='button' id ='retrieve'>Submit</button>
+     <div id='wordResult'></div>
+</body>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script>
+    $( document ).ready(function() {
+       $('#retrieve').click(function(e){
+           var word = $('#word').val().toLowerCase();
+           console.log(word);
+           $.ajax({
+           url: "/search",
+           type: "POST",
+           contentType: "application/json;charset=utf-8",
+           dataType: "*",
+           data: JSON.stringify({'query': word}),
+           success: function(data) {
+                    console.log(JSON.stringify(data));
+                   if (data.success) {
+                       var result = "";
+                       for (let i of data.result) {
+                           var name = `<h4><a href='static/reports/report${i['id']}.pdf'>${i['name']}</a></h4>`;
+                           var str = "";
+                           for (let j of i['content']) {
+                               str = str + `<p>${j}<p><br>`;
+                           }
+                           result = result + name + str;
+                       }
+                   }
+                   else {
+                       result = "<p> К сожалению по этому запросу ничего не найдено</p>";
+                   }
+            if ( $("#result").length )
+            {
+                $("#result").remove();
+            }
+           $("#wordResult").append("<div id=result>" + result + "</div>");
+          },
+          error: function(xhr) {
+            alert("нет такого")//Do Something to handle error
+         }
+         });
+       });
+    });
+  </script>
+</body>
+</html>

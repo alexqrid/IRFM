@@ -1,0 +1,11 @@
+{% if success %}
+    {% for i in result %}
+        <h4> {{ i['name'] }}</h4><br>
+        {% for j in i['content'] %}
+            {{ j }}<br>
+    {% endfor %}
+    {% endfor %}
+{% else %}
+    <p>К сожалению по вашему запросу ничего не найдено</p>
+{% endif %}
+

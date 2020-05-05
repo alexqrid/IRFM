@@ -7,7 +7,7 @@ class Config(object):
 
     CELERY_BROKER_URL = "redis://:f858bf5a779be228d9003d6d44725c6824d38f9a56c86cb4e0db33f801470b98@127.0.0.1:6000/0"
     CELERY_RESULT_BACKEND = "redis://:f858bf5a779be228d9003d6d44725c6824d38f9a56c86cb4e0db33f801470b98@127.0.0.1:6000/0"
-
+    ELASTICSEARCH_URL = "http://127.0.0.1:9200"
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     STATIC_DIR = os.path.abspath(BASE_DIR + "/static")
     # Define the database - we are working with

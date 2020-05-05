@@ -15,9 +15,12 @@ def hello_world():
 
 @app.route("/search", methods=('GET', 'POST'))
 def search():
-    q = escape(request.args.get('q'))
-    body = {
-        "_source": {"excludes": ["path", "attachment.content", "data", "attachment.language"]},
+    if request.method == "GET":
+        return render_template("search.html")
+    elif request.method == "POST":
+        q = request.get_json()['query']
+        body = {
+        "_source": { "includes":["attachment.title"]},
         "from": 0, "size": 100,
         "query": {
             "bool": {
@@ -27,13 +30,13 @@ def search():
                             "query": q,
                             "type": "phrase",
                             "fields": ["attachment.title^10", "attachment.content"],
-                            "analyzer": "english"}},
+                            "analyzer": "default"}},
                     {
                         "multi_match": {
                             "query": q,
                             "type": "most_fields",
                             "fields": ["attachment.title^2", "attachment.content"],
-                            "analyzer": "english"}}],
+                            "analyzer": "default"}}],
                 "minimum_should_match": 1}},
         "highlight": {
             "pre_tags": "<mark>",
@@ -44,14 +47,23 @@ def search():
                     "number_of_fragments": 1,
                     "fragment_size": 175},
                     "attachment.content": {
-                        "number_of_fragments": 3,
+                        "number_of_fragments": 5,
                         "fragment_size": 80
                     }
                 }}
-    }
-    res = es.search(index="reports", doc_type="pdf", body=body)
-    return jsonify(res['hits']['hits'])
-
+        }
+        res = es.search(index="reports", body=body)
+        result = []
+        success = False
+        if res['hits']['total']['value'] > 0:
+            for i in res['hits']['hits']:
+                result.append({"name": i['_source']['attachment']['title'],
+                               "id": i['_id'],
+                               "content": list(set(i['highlight'].get('attachment.content',
+                                                             i['highlight'].get('attachment.title', "ERROR"))))
+                })
+                success = True
+        return jsonify({"success":success, "result":result})
 
 @app.route('/process/<string:year>')
 def process(year):
