@@ -101,9 +101,13 @@ def graph(static, words, base_words, year):
     data_for_graph(static, words, year, norm=False)
     data_for_graph(static, base_words, year, norm=True)
     zipf_path = f"{static}/reports/fig_zipf{year}"
-
-    frequency = nltk.FreqDist(base_words)
+    path = f"{static}/reports/report_normalized{year}.txt"
+    with open(path,'r') as fd:
+        text = fd.read()
+        text = re.findall(r'(\b[а-яё]{4,20}\b)', text.lower())
+    frequency = nltk.FreqDist(text)
     if os.path.exists(zipf_path):
+        frequency.most_common(50)
         return frequency.most_common(50)
     order = OrderedDict(sorted(frequency.items(), key=lambda t: t[1], reverse=True))
     n = 50

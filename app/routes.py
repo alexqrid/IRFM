@@ -55,6 +55,8 @@ def search():
         res = es.search(index="reports", body=body)
         result = []
         success = False
+        from pprint import pprint
+        pprint (res)
         if res['hits']['total']['value'] > 0:
             for i in res['hits']['hits']:
                 result.append({"name": i['_source']['attachment']['title'],
