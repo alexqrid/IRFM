@@ -1,0 +1,27 @@
+<div class='content'>
+    <img src={{ graph['norm'] }} width="1200" height="480"><br>
+    <img src={{ graph['denorm'] }} width="1200" height="480"><br>
+    <img src={{ graph['zipf'] }} width="1200" height="480">
+    <table>
+      <tr>
+        <th>Ранг</th>
+        <th>Слово</th>
+        <th>Текущая частота</th>
+        <th>Отношение по закону Ципфа</th>
+        <th>Частота по закону Ципфа</th>
+        <th>Текущая разница</th>
+        <th>Процент отличия</th>
+      </tr>
+        {% for j in common %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ j['word'] }}</td>
+            <td>{{ j["actual_freq"] }}</td>
+            <td>{{ j["relative_freq"] }}</td>
+            <td>{{ j["zipf_freq"] }}</td>
+            <td>{{ j["diff_actual"] }}</td>
+            <td>{{ j["diff_percent"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>

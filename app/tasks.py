@@ -93,9 +93,6 @@ def data_for_graph(static, words, year, norm):
         points_y.append(func[i])
     plt.plot(points_x, points_y, color='r', linestyle='-')
     plt.ylabel('Размер словаря')
-    plt.xlabel('Количество слов в тексте')
-    plt.ylim([0, 17000])
-    plt.xlim([0, 80000])
     plt.savefig(save_path)
     return
 
@@ -122,7 +119,7 @@ def graph(static, words, base_words, year):
     plt.xlabel('Ранг')
     plt.xlim([0, n])
     plt.title(f"Топ {n} слов")
-    plt.savefig(f"{static}/reports/fig_zipf{year}")
+    plt.savefig(zipf_path)
     return frequency.most_common(50)
 
 
