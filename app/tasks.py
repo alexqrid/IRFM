@@ -110,6 +110,7 @@ def graph(static, words, base_words, year):
         frequency.most_common(50)
         return frequency.most_common(50)
     order = OrderedDict(sorted(frequency.items(), key=lambda t: t[1], reverse=True))
+
     n = 50
     y_pos = range(n)
     s = 1

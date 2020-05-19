@@ -1,6 +1,4 @@
-from datetime import datetime
 from base64 import b64encode as b64
-from elasticsearch.helpers import bulk
 from lxml import html
 import os
 from app import app, es

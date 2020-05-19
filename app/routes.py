@@ -2,7 +2,7 @@ from app import app, es
 from flask import render_template, jsonify, url_for, request, escape
 from .tasks import process_report
 import os
-
+from pprint import pprint
 
 @app.route('/')
 @app.route('/index')
@@ -20,37 +20,38 @@ def search():
     elif request.method == "POST":
         q = request.get_json()['query']
         body = {
-        "_source": { "includes":["attachment.title"]},
-        "from": 0, "size": 100,
-        "query": {
-            "bool": {
-                "should": [
-                    {
-                        "multi_match": {
-                            "query": q,
-                            "type": "phrase",
-                            "fields": ["attachment.title^10", "attachment.content"],
-                            "analyzer": "default"}},
-                    {
-                        "multi_match": {
-                            "query": q,
-                            "type": "most_fields",
-                            "fields": ["attachment.title^2", "attachment.content"],
-                            "analyzer": "default"}}],
-                "minimum_should_match": 1}},
-        "highlight": {
-            "pre_tags": "<mark>",
-            "post_tags": "</mark>",
+            "_source":{"include":["attachment.title"]},
+            "from":0,"size":100,
+    "query":{
+        "bool":{
+            "should":[
+                {
+                    "multi_match":{
+                        "query":q,
+                        "fuzziness":"auto",
+                        "fields": ["attachment.title^10","attachment.content"],
+                        "analyzer":"default"}},
+                {
+                    "multi_match":{
+                        "query": q,
+                        "type":"most_fields",
+                        "fuzziness": "auto",
+                        "fields": ["attachment.title^2","attachment.content"],
+                        "analyzer":"default"}}],
+                "minimum_should_match" : 1}},
+        "highlight":{
+            "pre_tags":"<mark>",
+            "post_tags":"</mark>",
             "boundary_scanner": "sentence",
             "fields":
-                {"attachment.title": {
-                    "number_of_fragments": 1,
-                    "fragment_size": 175},
-                    "attachment.content": {
-                        "number_of_fragments": 5,
-                        "fragment_size": 80
-                    }
-                }}
+                {"attachment.title":{
+                    "number_of_fragments":1,
+                    "fragment_size":175},
+                "attachment.content":{
+                    "number_of_fragments":5,
+                    "fragment_size":120
+                }
+            }}
         }
         res = es.search(index="reports", body=body)
         result = []
@@ -59,12 +60,13 @@ def search():
         pprint (res)
         if res['hits']['total']['value'] > 0:
             for i in res['hits']['hits']:
-                result.append({"name": i['_source']['attachment']['title'],
-                               "id": i['_id'],
-                               "content": list(set(i['highlight'].get('attachment.content',
-                                                             i['highlight'].get('attachment.title', "ERROR"))))
-                })
-                success = True
+                if i['_source'].get('attachment',None):
+                    result.append({"name": i['_source']['attachment']['title'],
+                                   "id": i['_id'],
+                                   "content": list(set(i['highlight'].get('attachment.content',
+                                                                 i['highlight'].get('attachment.title', "ERROR"))))
+                    })
+                    success = True
         return jsonify({"success":success, "result":result})
 
 @app.route('/process/<string:year>')
